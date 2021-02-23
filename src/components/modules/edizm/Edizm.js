@@ -7,7 +7,6 @@ import App from '../../App';
 import ModuleHeader from "../../lib/ModuleHeader";
 import FilterPanel from "../../lib/FilterPanel";
 import BlockRatio from "./BlockRatio";
-import WithBlockRatio from "./WithBlockRatio";
 import * as globalSettings from "../../lib/const";
 
 const MOD_TITLE = "Единицы измерения";

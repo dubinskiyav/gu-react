@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 // Эта функция принимает компонент...
+// https://ru.reactjs.org/docs/higher-order-components.html
 function WithBlockRatio(WrappedComponent) {
   
     return class extends React.Component {

@@ -1,5 +1,6 @@
 import React from "react";
 import { Checkbox, Radio,  } from 'antd';
+import WithBlockRatio from "./WithBlockRatio";
 
 /**
  * Элемент фильтра для модуля
@@ -15,4 +16,4 @@ function BlockRatio(props) {
     );
 }
 
-export default BlockRatio;
+export default WithBlockRatio(BlockRatio);
