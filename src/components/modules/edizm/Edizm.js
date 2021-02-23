@@ -8,6 +8,7 @@ import ModuleHeader from "../../lib/ModuleHeader";
 import FilterPanel from "../../lib/FilterPanel";
 import BlockRatio from "./BlockRatio";
 import * as globalSettings from "../../lib/const";
+import RadioGroup from "../../lib/RadioGroup";
 
 const MOD_TITLE = "Единицы измерения";
 const MODE_HELP_ID = "/help/edizm";
@@ -93,15 +94,17 @@ const Edizm = (props)=>{
     let [totalMax, setTotalMax] = React.useState(0); // Наибольшее количесвто выбранных записей
 
 
-    // Создание компонент для фильтров
-    const [blockRatioValue, setBlockRatioValue] = React.useState(1);
-    
     // key это уникальное имя фильтра, попадает в REST API
     const buildFilters = ()=>{
         // Обязательно назначить key у элемента
         return <React.Fragment>
             <Checkbox key="onlyBlock">Только заблокированные</Checkbox>
-            <BlockRatio value={blockRatioValue}/>
+            {/* Смотреть комментарии в RadioGroup */}
+            <RadioGroup key="blockFlag" initValue={1}>
+                <Radio value={1}>Все</Radio>
+                <Radio value={2}>Заблокированные</Radio>
+                <Radio value={3}>Не запблкированные</Radio>
+            </RadioGroup>
         </React.Fragment>
     }
     
@@ -150,7 +153,8 @@ const Edizm = (props)=>{
             //blockRatioValue = 2;
         }
         requestParams.filters = {
-            onlyBlock:config.onlyBlock?config.onlyBlock.target.checked:false
+            onlyBlock:config.onlyBlock?config.onlyBlock.target.checked:false,
+            blockFlag:config.blockFlag?config.blockFlag.target.value:1,
         }
         refreshData();
     }
@@ -188,22 +192,33 @@ const Edizm = (props)=>{
             data:JSON.stringify(gelRequestParam)
         })
         .then(dataNew => {
-            setData(dataNew); // данные новые
-            // переустановим total у таблицы
-            requestParams.pagination.total =  total; 
-            // сброс отметок записей
-            setSelectRows([]);
+            //console.log("dataNew = ", dataNew);
+            // Проверим ошибку
+            if ( dataNew.length == 1 && dataNew[0].notation == "errorCode=38" ) {
+                notification.error({
+                    message: "Ошибка при выборке данных",
+                    description: dataNew[0].name
+                });
+                setLoading(false);
+            } else {
+                setData(dataNew); // данные новые
+                // переустановим total у таблицы
+                requestParams.pagination.total =  total; 
+                // сброс отметок записей
+                setSelectRows([]);
+                setLoading(false);
+            }
         },
         // todo Сделать обработку ошибок
         (error) => {
             notification.error({
-            message:"Ошибка при выборке за пределами программы",
-            description: "error"
+            message:"Ошибка при выборке за пределами Российской Федерации",
+                description: "error"
             });
             console.log('refreshData - error=' + error);
+            setLoading(false);
         }
         );
-        setLoading(false);
         console.log('refreshData - finish');
     }
 
