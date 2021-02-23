@@ -4,7 +4,6 @@ import ModuleHeader from "../../lib/ModuleHeader";
 
 const MOD_TITLE = "Нормативно-справочная информация";
 
-
 const ReferenceBooks = (props)=>{
   return (
         <App subsystem={'referencebooks'} menu={'none'} submenu={'none'}

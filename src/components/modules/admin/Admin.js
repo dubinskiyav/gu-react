@@ -10,7 +10,7 @@ const Admin = (props)=>{
             breadcrumb={[{label:'Администрирование'}]}>
             <ModuleHeader title={MOD_TITLE}/>
             <p>
-            Администрирование
+              Администрирование
             </p>
         </App>
   )

@@ -13,6 +13,9 @@ import ReferenceBooks from "./components/modules/referencebooks/ReferenceBooks";
 import Storage from "./components/modules/storage/Storage";
 import Acc from "./components/modules/acc/Acc";
 import Admin from "./components/modules/admin/Admin";
+import Usefullinks from "./components/modules/admin/Usefullinks";
+import Test01 from "./components/lib/test01";
+
 import Edizm from "./components/modules/edizm/Edizm";
 
 document.documentElement.lang = 'ru';
@@ -33,6 +36,8 @@ ReactDOM.render(
         <Route exact path='/storage'><Storage/></Route>
         <Route exact path='/acc'><Acc/></Route>
         <Route exact path='/admin'><Admin/></Route>
+        <Route exact path='/usefullinks'><Usefullinks/></Route>
+        <Route exact path='/test01'><Test01/></Route>
         <Route path='/help'><Help /></Route> {/* Когда location.pathname это '/help' или '/help/2', prop path совпадает */}
         <Route><Error text="Страница не найдена" helpId="/help/pagenotfound"/></Route> {/* Не нашли - ошибка */}
       </Switch>

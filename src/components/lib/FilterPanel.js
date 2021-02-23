@@ -12,6 +12,7 @@ const FilterPanel = (props)=>{
     // Смена элемента key на значение val
     const changed = (key,val)=>{
         config[key] = val; // запишем в config новое значение
+        console.log("key=" , key, "val=", val);
         if (props.onChange) {
             props.onChange(config); // вызовем переданный метод onChange
         }

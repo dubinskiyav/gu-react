@@ -1,10 +1,13 @@
 import React from 'react';
-import { Button, Table, notification,Checkbox,Form } from 'antd';
+import { Space, Button, Table, notification,Checkbox,Form } from 'antd';
+import { Radio } from 'antd';
 import {CheckOutlined} from '@ant-design/icons';
 import reqwest from 'reqwest';
 import App from '../../App';
 import ModuleHeader from "../../lib/ModuleHeader";
 import FilterPanel from "../../lib/FilterPanel";
+import BlockRatio from "./BlockRatio";
+import WithBlockRatio from "./WithBlockRatio";
 import * as globalSettings from "../../lib/const";
 
 const MOD_TITLE = "Единицы измерения";
@@ -73,15 +76,6 @@ const COLUMNS=[
 ]  
 const idName = "edizm_id";
 
-// Создание компонент для фильтров
-// key это уникальное имя фильтра, попадает в REST API
-const buildFilters = ()=>{
-    return <React.Fragment>
-        <Checkbox key="onlyBlock">Только заблокированные</Checkbox>
-    </React.Fragment>
-}
-
-  
 const Edizm = (props)=>{
     let [data,setData] = React.useState(null); // Основной массив данных - пустой сначала
     let [selectRows,setSelectRows] = React.useState([]);
@@ -99,6 +93,20 @@ const Edizm = (props)=>{
     let [loading,setLoading] = React.useState(false); // Момент загрузки данных для блокировки таблицы для действий
     let [totalMax, setTotalMax] = React.useState(0); // Наибольшее количесвто выбранных записей
 
+
+    // Создание компонент для фильтров
+    const [blockRatioValue, setBlockRatioValue] = React.useState(1);
+    
+    // key это уникальное имя фильтра, попадает в REST API
+    const buildFilters = ()=>{
+        // Обязательно назначить key у элемента
+        return <React.Fragment>
+            <Checkbox key="onlyBlock">Только заблокированные</Checkbox>
+            <BlockRatio value={blockRatioValue}/>
+        </React.Fragment>
+    }
+    
+      
     /**
     * Обработчик смены параметров запроса из таблицы
     * @param {*} paginationNew // При смене пагинации
@@ -132,17 +140,18 @@ const Edizm = (props)=>{
         
     // Установка фильтра
     const setFilters = (config)=>{
-        console.log("config = " + JSON.stringify(config));
-        console.log("config.onlyBlock.value = " + config.onlyBlock.target.checked);
-        console.log("config[onlyBlock].value = " + config["onlyBlock"].target.checked);
-
+        //debugger;
+        console.log("config = ", config);
         // Обнулим фильтры
-        requestParams.filters = [];
-        if (config.onlyBlock.target.checked == true) {
-            requestParams.filters.push({
-                key: "onlyBlock",
-                value: "true",
-            });
+        //requestParams.filters = [];
+        //Установим фильтры
+        // проверим чекбокс
+        if (config.blockRatio) {
+
+            //blockRatioValue = 2;
+        }
+        requestParams.filters = {
+            onlyBlock:config.onlyBlock?config.onlyBlock.target.checked:false
         }
         refreshData();
     }

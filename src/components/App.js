@@ -70,8 +70,22 @@ const getSubMenu=(sys)=>{
       </React.Fragment>)
     case 'admin': {/* Администрирование */}
       return (<React.Fragment>
-        <Menu.Item key="user" icon={<UserOutlined />}>Пользователи</Menu.Item>
-        <Menu.Item key="audit" icon={<AuditOutlined />}>Аудит</Menu.Item>
+        <SubMenu key="help" icon={<AppstoreOutlined/>} title="Помощь">
+          <Menu.Item key="help.usefullinks">
+              <Link to="/usefullinks">Полезные ссылки</Link>
+            </Menu.Item>
+        </SubMenu>
+        <SubMenu key="develop" icon={<AppstoreOutlined/>} title="В разработке">
+          <Menu.Item key="develop.user">
+            <Link to="/user">Пользователи</Link>
+          </Menu.Item>
+          <Menu.Item key="develop.audit">
+            <Link to="/audit">Аудит</Link>
+          </Menu.Item>
+          <Menu.Item key="develop.test01">
+            <Link to="/test01">Тест 01</Link>
+          </Menu.Item>
+        </SubMenu>
       </React.Fragment>)
   default:
   }
