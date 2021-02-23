@@ -4,12 +4,24 @@ import React, { useState } from 'react';
 // https://ru.reactjs.org/docs/higher-order-components.html
 function WithBlockRatio(WrappedComponent) {
   
+    console.log("WithBlockRatio(WrappedComponent", WrappedComponent);
+
+
     return class extends React.Component {
-        constructor(props) {
-          super(props);
-        }
-    
-    
+
+        componentWillReceiveProps(nextProps) {
+            console.log("prevProps", this.props);
+            console.log("nextProps", nextProps);
+            if (nextProps.count !== this.props.count) {
+              this.setState({
+                count: nextProps.count > 100 ? 100 : nextProps.count
+              });
+            }
+          }
+          onClick() {
+            console.log("prevProps", this.props);
+          }
+
         render() {
           // ... и рендерит оборачиваемый компонент со свежими данными!
           // Обратите внимание, что мы передаём остальные пропсы
