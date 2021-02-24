@@ -1,14 +1,16 @@
 import React from 'react';
-import { Space, Button, Table, notification,Checkbox,Form } from 'antd';
+import { Space, Button, Table, notification, Checkbox,Form } from 'antd';
 import { Radio } from 'antd';
 import {CheckOutlined} from '@ant-design/icons';
 import reqwest from 'reqwest';
 import App from '../../App';
 import ModuleHeader from "../../lib/ModuleHeader";
 import FilterPanel from "../../lib/FilterPanel";
-import BlockRatio from "./BlockRatio";
+import {BUTTON_ADD_LABEL,BUTTON_DEL_LABEL,BUTTON_REFRESH_LABEL,MSG_CONFIRM_DELETE} from "../../lib/const";
 import * as globalSettings from "../../lib/const";
 import RadioGroup from "../../lib/RadioGroup";
+import EditForm from "../../lib/EditForm";
+import EdizmForm from "./EdizmForm";
 
 const MOD_TITLE = "Единицы измерения";
 const MODE_HELP_ID = "/help/edizm";
@@ -31,10 +33,10 @@ const AUTO_REFRESH = true;
 // URI для использования формой добавления/изменения
 const URI_ROOT = globalSettings.startURL + "edizm"
 const URI_SELECT = URI_ROOT + "/read"
+const URI_READ_BY_ID = URI_ROOT + "/read" 
+const URI_CREATE_ONE = URI_ROOT + "/create"
 const URI_DEL = URI_ROOT + "/delete"
-const URI_ADD = URI_ROOT + "/create"
-const URI_UPD = URI_ROOT + "/update" 
-const URI_POST = URI_ROOT + "/save"
+const URI_SAVE = URI_ROOT + "/save"
 
 // колонки в таблице
 // id не надо! - Его описать в key таблицы
@@ -76,6 +78,11 @@ const COLUMNS=[
 ]  
 const idName = "edizm_id";
 
+// Форма для редактирования
+const buildForm = (form)=>{
+    return <EdizmForm form={form} initialValues={{}}/>
+}
+
 const Edizm = (props)=>{
     let [data,setData] = React.useState(null); // Основной массив данных - пустой сначала
     let [selectRows,setSelectRows] = React.useState([]);
@@ -92,6 +99,14 @@ const Edizm = (props)=>{
     });
     let [loading,setLoading] = React.useState(false); // Момент загрузки данных для блокировки таблицы для действий
     let [totalMax, setTotalMax] = React.useState(0); // Наибольшее количесвто выбранных записей
+    const [form] = Form.useForm(); // Форма для редактирования
+    let [formVisible,setFormVisible] = React.useState(false); // Видимость формы
+    // Контекст для редактирования - урлы
+    let [editorContext] = React.useState({
+      uriForEdit:URI_READ_BY_ID,
+      uriForAdd:URI_CREATE_ONE,
+      uriForSave:URI_SAVE 
+    });
 
 
     // key это уникальное имя фильтра, попадает в REST API
@@ -225,6 +240,9 @@ const Edizm = (props)=>{
         console.log('refreshData - finish');
     }
 
+    const deleteData = ()=>{
+    }
+
     React.useEffect(() => {
         if(!data && AUTO_REFRESH) {
           setData([]); // важно, иначе начальный refresh выполняется несколько раз
@@ -239,11 +257,24 @@ const Edizm = (props)=>{
         }
     }
         
+    const callForm = (id)=>{
+        console.log("callForm id = ", id);
+        form.resetFields();
+        editorContext.id = id;
+        setFormVisible(true);
+    }
+    
     return (
         <App subsystem={MNU_SUBSYSTEM} menu={MNU_MENU} submenu={MNU_SUMMENU}
              breadcrumb={[{label:NAME_SUBSYSTEM,href:HREF_SUBSYSTEM},{label:NAME_MENU},{label:MOD_TITLE}]}
              helpId={MODE_HELP_ID}>
-            <ModuleHeader title={MOD_TITLE}/>
+            <ModuleHeader title={MOD_TITLE}
+                buttons={[
+                    <Button key="del" onClick={()=>deleteData()} disabled={loading || selectRows.length===0}>{BUTTON_DEL_LABEL}</Button>,
+                    <Button key="refresh" onClick={()=>refreshData()} disabled={loading}>{BUTTON_REFRESH_LABEL}</Button>,
+                    <Button key="add" onClick={()=>callForm()} type="primary">{BUTTON_ADD_LABEL}</Button>,                  
+                ]}
+            />
             <FilterPanel  onChange={(fc)=>setFilters(fc)}>
               {buildFilters()}
             </FilterPanel>
@@ -260,7 +291,28 @@ const Edizm = (props)=>{
                 rowKey="id"
                 size={"middle"}
                 showSorterTooltip={false}
+                onRow={(record, rowIndex) => {
+                    return {
+                      onClick: event => callForm(record.id)
+                    };
+                }}
             />
+
+            <EditForm visible={formVisible}
+                form={form}
+                editorContext={editorContext}
+                afterSave={()=>{
+                    setFormVisible(false);
+                    refreshData()
+                }}
+                afterCancel={()=>{
+                    setFormVisible(false);
+                }}
+            >
+                {buildForm(form)}
+            </EditForm>
+
+
         </App>
     )
 }
