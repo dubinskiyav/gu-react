@@ -86,7 +86,7 @@ const Edizm = (props)=>{
             showSizeChanger:true, 
             current:1, 
             pageSize:DEFAULT_PAGE_SIZE, 
-            total: null, // общее количество считанных записей
+            total: DEFAULT_PAGE_SIZE * 2, // общее количество считанных записей
         },
         sort:[{field:idName,order:'ascend'}],
     });
@@ -194,11 +194,15 @@ const Edizm = (props)=>{
         .then(dataNew => {
             //console.log("dataNew = ", dataNew);
             // Проверим ошибку
-            if ( dataNew.length == 1 && dataNew[0].notation == "errorCode=38" ) {
+            const { errorCode } = dataNew;
+            if ( errorCode ) {
+                console.log('errorCode=', errorCode);
+                const { errorMessage, errorCause } = dataNew;
                 notification.error({
-                    message: "Ошибка при выборке данных",
-                    description: dataNew[0].name
+                  message: (errorMessage),
+                  description: (errorCause)
                 });
+                console.log('refreshData - error = ', dataNew);
                 setLoading(false);
             } else {
                 setData(dataNew); // данные новые
@@ -212,10 +216,9 @@ const Edizm = (props)=>{
         // todo Сделать обработку ошибок
         (error) => {
             notification.error({
-            message:"Ошибка при выборке за пределами Российской Федерации",
-                description: "error"
+                message:"Ошибка при выборке за пределами программы",
             });
-            console.log('refreshData - error=' + error);
+            console.log('refreshData - error = ', error);
             setLoading(false);
         }
         );
