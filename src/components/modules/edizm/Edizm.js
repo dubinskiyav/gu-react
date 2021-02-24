@@ -10,6 +10,8 @@ import {BUTTON_ADD_LABEL,BUTTON_DEL_LABEL,BUTTON_REFRESH_LABEL,MSG_CONFIRM_DELET
 import * as globalSettings from "../../lib/const";
 import RadioGroup from "../../lib/RadioGroup";
 import EditForm from "../../lib/EditForm";
+import {confirm} from "../../lib/Dialogs";
+import { format } from 'react-string-format';
 import EdizmForm from "./EdizmForm";
 
 const MOD_TITLE = "Единицы измерения";
@@ -33,10 +35,11 @@ const AUTO_REFRESH = true;
 // URI для использования формой добавления/изменения
 const URI_ROOT = globalSettings.startURL + "edizm"
 const URI_SELECT = URI_ROOT + "/read"
-const URI_READ_BY_ID = URI_ROOT + "/read" 
-const URI_CREATE_ONE = URI_ROOT + "/create"
-const URI_DEL = URI_ROOT + "/delete"
-const URI_SAVE = URI_ROOT + "/save"
+const URI_READ_BY_ID = URI_ROOT + "/readbyid" 
+const URI_READ_FOR_ADD = URI_ROOT + "/readforadd"
+const URI_INSERT = URI_ROOT + "/insert"
+const URI_UPDATE = URI_ROOT + "/update"
+const URI_DELETE = URI_ROOT + "/delete"
 
 // колонки в таблице
 // id не надо! - Его описать в key таблицы
@@ -104,8 +107,9 @@ const Edizm = (props)=>{
     // Контекст для редактирования - урлы
     let [editorContext] = React.useState({
       uriForEdit:URI_READ_BY_ID,
-      uriForAdd:URI_CREATE_ONE,
-      uriForSave:URI_SAVE 
+      uriForAdd:URI_READ_FOR_ADD,
+      uriForIns:URI_INSERT, 
+      uriForUpd:URI_UPDATE,
     });
 
 
@@ -241,6 +245,37 @@ const Edizm = (props)=>{
     }
 
     const deleteData = ()=>{
+        let ids = selectRows.join(',');
+        confirm(format(MSG_CONFIRM_DELETE,selectRows.length),()=>{
+            console.log("Delete record "+ids);
+            setLoading(true); // Блокируем отклики таблицы
+            reqwest({
+                url: URI_DELETE + '/' + ids,
+                contentType: "application/json; charset=utf-8",
+                method: 'post',
+                type: 'json',
+            }).then((responseJson) => {
+                console.log('responseJson=', responseJson);
+                const { errorCode } = responseJson;
+                if (errorCode) { // Ошибка есть
+                    console.log('errorCode=', errorCode);
+                    const { errorMessage, errorCause } = responseJson;
+                    notification.error({
+                        message: (errorMessage),
+                        description: (errorCause)
+                    });
+                } else { // ошибки нет
+                    console.log('Удалили ' + ids);
+                    refreshData();
+                    const description = "Удаление " + selectRows.length + " записей выполнено успешно";
+                    notification.success({
+                        message:"Успешно",
+                        description: (description)
+                    });
+                }
+                setLoading(false);
+            });
+        })
     }
 
     React.useEffect(() => {

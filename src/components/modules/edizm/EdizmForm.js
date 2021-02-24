@@ -27,7 +27,7 @@ const EdizmForm = (props)=>{
                     message: 'Длина наименования не может быть больше 50',
                 },
             ]}>
-            <Input />
+            <Input ref={firstInputRef} />
         </Form.Item>
         <Form.Item name="notation" label="Обозначение"
             rules={[
@@ -52,7 +52,7 @@ const EdizmForm = (props)=>{
                     message: 'Длина кода не может быть больше 20',
                 }
             ]}>
-            <Input ref={firstInputRef} style={{width:80}}/>
+            <Input style={{width:80}}/>
         </Form.Item>
     </Form>
 }    

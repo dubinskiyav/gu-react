@@ -5,6 +5,7 @@ export const swaggerURI = "swagger-ui.html";
 export const BUTTON_ADD_LABEL = "Добавить";
 export const BUTTON_DEL_LABEL = "Удалить";
 export const BUTTON_REFRESH_LABEL = "Обновить";
+export const MSG_CONFIRM_DELETE="Вы действительно хотите удалить {0} записей";
 
 export const FORM_ITEMS_LAYOUT = {
     labelCol: {
