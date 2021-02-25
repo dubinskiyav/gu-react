@@ -14,12 +14,11 @@ const EditForm = (props)=>{
 
     //Загрузка данных для изменения по id или добавления
     const load = ()=>{
-        //setLoading(true);
+        setLoading(true);
         let url = props.editorContext.uriForAdd;
         if(props.editorContext.id) {
             url = props.editorContext.uriForEdit + '/' + props.editorContext.id;
         }
-        setLoading(false);
         // запрос к REST API на выборку по id
         reqwest({
             url: url,
@@ -27,11 +26,11 @@ const EditForm = (props)=>{
             method: 'get',
             type: 'json',
         }).then(record => {
+            setLoading(false);
             console.log("record = " + JSON.stringify(record));
             // Проверим ошибку
-            const { errorCode } = record;
-            if ( errorCode ) {
-                const { errorMessage } = record;
+            const { errorCode, errorMessage } = record;
+            if ( errorCode || errorMessage ) {
                 console.log('errorMessage=', errorMessage);
                 notification.error({
                     message: 'Ошибка получения данных',
@@ -43,7 +42,6 @@ const EditForm = (props)=>{
                 setData(record); // данные новые
             }
         },
-        // todo Сделать обработку ошибок
         (error) => {
             notification.error({
                 message:"Ошибка при выборке за пределами программы",
@@ -80,22 +78,33 @@ const EditForm = (props)=>{
             type: 'json',
             data:JSON.stringify(record)
         }).then((dataNew) => {
-            const { errorCode } = dataNew;
-            if ( errorCode ) {
+            console.log("dataNew = ",  dataNew);
+            const { errorCode, errorMessage } = dataNew;
+            if ( errorCode || errorMessage ) {
                 console.log('errorCode=', errorCode);
-                const { errorMessage, errorCause } = dataNew;
+                const { errorCause } = dataNew;
                 notification.error({
                   message: (errorMessage),
                   description: (errorCause)
                 });
+                setLoading(false);
                 console.log('refreshData - error = ', dataNew);
             } else {
                 // в случае успеха
                 setLoading(false);
                 after();
             }
-        })
-
+        },
+        (error) =>  {
+            console.log("error = ",  error);
+            const { errorMessage, errorCause } = error;
+            notification.error({
+                message: (errorMessage),
+                description: (errorCause)
+            });
+            console.log('refreshData - error=' + error);
+            setLoading(false);
+        });
     }
 
     return <Modal

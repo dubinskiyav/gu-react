@@ -38,7 +38,15 @@ const EdizmForm = (props)=>{
             ]}>
             <Input style={{width:80}}/>
         </Form.Item>
-        <Form.Item name="blockflag" {...FORM_ITEMS_LAYOUT_WITHOUT_LABEL} valuePropName="checked" >
+        <Form.Item 
+            name="blockflag" 
+            {...FORM_ITEMS_LAYOUT_WITHOUT_LABEL} 
+            valuePropName="checked" 
+            getValueFromEvent={(event)=>{
+                console.log("blockflag event=", event);
+                return event.target.checked?1:0;
+            }}
+            >
             <Checkbox>Заблокированность</Checkbox>
         </Form.Item>
         <Form.Item name="code" label="Код"

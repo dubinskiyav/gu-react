@@ -213,10 +213,10 @@ const Edizm = (props)=>{
         .then(dataNew => {
             //console.log("dataNew = ", dataNew);
             // Проверим ошибку
-            const { errorCode } = dataNew;
-            if ( errorCode ) {
+            const { errorCode, errorMessage } = dataNew;
+            if ( errorCode || errorMessage ) {
                 console.log('errorCode=', errorCode);
-                const { errorMessage, errorCause } = dataNew;
+                const { errorCause } = dataNew;
                 notification.error({
                   message: (errorMessage),
                   description: (errorCause)
@@ -256,10 +256,10 @@ const Edizm = (props)=>{
                 type: 'json',
             }).then((responseJson) => {
                 console.log('responseJson=', responseJson);
-                const { errorCode } = responseJson;
-                if (errorCode) { // Ошибка есть
-                    console.log('errorCode=', errorCode);
-                    const { errorMessage, errorCause } = responseJson;
+                const { errorCode, errorMessage } = responseJson;
+                if ( errorCode || errorMessage ) {
+                        console.log('errorCode=', errorCode);
+                    const { errorCause } = responseJson;
                     notification.error({
                         message: (errorMessage),
                         description: (errorCause)
