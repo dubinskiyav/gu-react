@@ -10,14 +10,16 @@ import reqwest from 'reqwest';
 const EditForm = (props)=>{
     // данные
     let [ data, setData]  = React.useState(null);
-    let loadingFlag = true;
+    let [loading,setLoading]= React.useState(false);
 
     //Загрузка данных для изменения по id или добавления
     const load = ()=>{
+        //setLoading(true);
         let url = props.editorContext.uriForAdd;
         if(props.editorContext.id) {
             url = props.editorContext.uriForEdit + '/' + props.editorContext.id;
         }
+        setLoading(false);
         // запрос к REST API на выборку по id
         reqwest({
             url: url,
@@ -29,15 +31,14 @@ const EditForm = (props)=>{
             // Проверим ошибку
             const { errorCode } = record;
             if ( errorCode ) {
-                setTimeout(() => {
-                    loadingFlag = false;
-                }, 1000);
                 const { errorMessage } = record;
                 console.log('errorMessage=', errorMessage);
                 notification.error({
                     message: 'Ошибка получения данных',
                     description: (errorMessage)
                 });
+                props.afterCancel();
+                setData(null);
             } else {
                 setData(record); // данные новые
             }
@@ -49,17 +50,19 @@ const EditForm = (props)=>{
                 description: "error"
             });
             console.log('refreshData - error=' + error);
+            setLoading(false);
         });
     }
 
     if(!data && props.visible) {
-        loadingFlag = true;
+        setData({});
         load();
     }
 
 
     //Сохранение
     const save=(values,after)=>{
+        setLoading(true);
         const record = { // сцепим id и vslues в один объект
             "id": props.editorContext.id,
             ...values
@@ -88,6 +91,7 @@ const EditForm = (props)=>{
                 console.log('refreshData - error = ', dataNew);
             } else {
                 // в случае успеха
+                setLoading(false);
                 after();
             }
         })
@@ -95,7 +99,8 @@ const EditForm = (props)=>{
     }
 
     return <Modal
-        visible={props.visible  && loadingFlag }
+        visible={props.visible }
+        confirmLoading={loading}
         title={props.editorContext.id?"Изменение записи":"Новая запись"}
         okText={props.editorContext.id?"Изменить":"Добавить"}
         cancelText="Отмена"
